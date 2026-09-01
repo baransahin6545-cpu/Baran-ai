@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baran AI</title>
+</head>
+
+<body style="background:#050910;color:white;text-align:center;font-family:Arial;padding-top:50px">
+
+<h1>BARAN AI</h1>
+<p>JARVIS prototipi v1</p>
+
+<div style="font-size:80px;margin:40px">◉</div>
+
+<button onclick="dinle()" style="font-size:20px;padding:15px 25px">
+🎙️ Dinle
+</button>
+
+<p id="durum">Hazır.</p>
+
+<script>
+function dinle() {
+
+const SpeechRecognition =
+window.SpeechRecognition ||
+window.webkitSpeechRecognition;
+
+if (!SpeechRecognition) {
+document.getElementById("durum").innerText =
+"Ses tanıma desteklenmiyor.";
+return;
+}
+
+const r = new SpeechRecognition();
+
+r.lang = "tr-TR";
+
+r.onstart = function() {
+document.getElementById("durum").innerText =
+"🎙️ Dinliyorum...";
+};
+
+r.onresult = function(e) {
+
+const mesaj =
+e.results[0][0].transcript;
+
+document.getElementById("durum").innerText =
+"Sen: " + mesaj;
+
+const cevap =
+new SpeechSynthesisUtterance(
+"Seni duydum Baran."
+);
+
+cevap.lang = "tr-TR";
+
+speechSynthesis.speak(cevap);
+};
+
+r.onerror = function(e) {
+
+document.getElementById("durum").innerText =
+"Hata: " + e.error;
+
+};
+
+r.start();
+
+}
+</script>
+
+</body>
+</html>
