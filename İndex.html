@@ -3,71 +3,164 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Baran AI</title>
-</head>
+<title>BARAN AI</title>
 
-<body style="background:#050910;color:white;text-align:center;font-family:Arial;padding-top:50px">
-
-<h1>BARAN AI</h1>
-<p>JARVIS prototipi v1</p>
-
-<div style="font-size:80px;margin:40px">◉</div>
-
-<button onclick="dinle()" style="font-size:20px;padding:15px 25px">
-🎙️ Dinle
-</button>
-
-<p id="durum">Hazır.</p>
-
-<script>
-function dinle() {
-
-const SpeechRecognition =
-window.SpeechRecognition ||
-window.webkitSpeechRecognition;
-
-if (!SpeechRecognition) {
-document.getElementById("durum").innerText =
-"Ses tanıma desteklenmiyor.";
-return;
+<style>
+body{
+    margin:0;
+    background:#050b14;
+    color:#00eaff;
+    font-family:Arial,sans-serif;
+    text-align:center;
 }
 
-const r = new SpeechRecognition();
+.container{
+    padding:35px 20px;
+}
 
-r.lang = "tr-TR";
+h1{
+    font-size:42px;
+    letter-spacing:5px;
+    text-shadow:0 0 20px #00eaff;
+}
 
-r.onstart = function() {
-document.getElementById("durum").innerText =
-"🎙️ Dinliyorum...";
-};
+#orb{
+    width:180px;
+    height:180px;
+    margin:45px auto 30px;
+    border:3px solid #00eaff;
+    border-radius:50%;
+    box-shadow:0 0 25px #00eaff,0 0 70px #0066ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:70px;
+    animation:pulse 2s infinite;
+}
 
-r.onresult = function(e) {
+@keyframes pulse{
+    50%{
+        transform:scale(1.08);
+        box-shadow:0 0 50px #00eaff,0 0 100px #0066ff;
+    }
+}
 
-const mesaj =
-e.results[0][0].transcript;
+button{
+    background:#061522;
+    color:#00eaff;
+    border:2px solid #00eaff;
+    border-radius:12px;
+    padding:15px 30px;
+    font-size:20px;
+    box-shadow:0 0 15px #00eaff;
+}
 
-document.getElementById("durum").innerText =
-"Sen: " + mesaj;
+button:active{
+    transform:scale(.95);
+}
 
-const cevap =
-new SpeechSynthesisUtterance(
-"Seni duydum Baran."
-);
+#durum{
+    margin-top:25px;
+    font-size:18px;
+}
 
-cevap.lang = "tr-TR";
+#cevap{
+    margin:30px auto;
+    max-width:600px;
+    min-height:50px;
+    padding:20px;
+    border:1px solid #075d78;
+    border-radius:15px;
+    background:#07121e;
+    color:white;
+}
+</style>
+</head>
 
-speechSynthesis.speak(cevap);
-};
+<body>
 
-r.onerror = function(e) {
+<div class="container">
 
-document.getElementById("durum").innerText =
-"Hata: " + e.error;
+<h1>BARAN AI</h1>
 
-};
+<div id="orb">◉</div>
 
-r.start();
+<button onclick="dinle()">🎙️ DİNLE</button>
 
+<div id="durum">Hazır...</div>
+
+<div id="cevap">
+Merhaba Baran. Ben hazırım.
+</div>
+
+</div>
+
+<script>
+function konus(metin){
+    document.getElementById("cevap").innerText=metin;
+
+    if("speechSynthesis" in window){
+        let ses=new SpeechSynthesisUtterance(metin);
+        ses.lang="tr-TR";
+        ses.rate=1;
+        speechSynthesis.speak(ses);
+    }
+}
+
+function dinle(){
+
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if(!SpeechRecognition){
+        konus("Tarayıcınız sesli komutu desteklemiyor.");
+        return;
+    }
+
+    let recognition=new SpeechRecognition();
+
+    recognition.lang="tr-TR";
+    recognition.continuous=false;
+    recognition.interimResults=false;
+
+    document.getElementById("durum").innerText="Dinliyorum...";
+
+    recognition.start();
+
+    recognition.onresult=function(event){
+
+        let komut=event.results[0][0].transcript.toLowerCase();
+
+        document.getElementById("durum").innerText=
+            "Sen: "+komut;
+
+        if(komut.includes("merhaba")){
+            konus("Merhaba. Size nasıl yardımcı olabilirim?");
+        }
+
+        else if(komut.includes("nasılsın")){
+            konus("Teşekkür ederim. Sistemlerim hazır.");
+        }
+
+        else if(komut.includes("saat")){
+            let saat=new Date().toLocaleTimeString("tr-TR");
+            konus("Şu an saat "+saat);
+        }
+
+        else{
+            konus("Komutunuzu duydum: "+komut);
+        }
+    };
+
+    recognition.onerror=function(){
+        document.getElementById("durum").innerText=
+            "Ses alınamadı. Tekrar deneyin.";
+    };
+
+    recognition.onend=function(){
+        document.getElementById("durum").innerText="Hazır...";
+    };
 }
 </script>
 
