@@ -2,430 +2,842 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BARAN AI</title>
 
 <style>
 *{box-sizing:border-box}
+
 body{
-margin:0;background:#020711;color:#dffcff;
-font-family:Arial,sans-serif;min-height:100vh;
+    margin:0;
+    min-height:100vh;
+    background:#020711;
+    color:#eafcff;
+    font-family:Arial,sans-serif;
+    display:flex;
+    justify-content:center;
 }
-header{
-height:65px;padding:0 18px;display:flex;
-align-items:center;justify-content:space-between;
-border-bottom:1px solid #00eaff44;
-background:#020914;
+
+.app{
+    width:100%;
+    max-width:760px;
+    padding:25px 18px 40px;
 }
-.logo{font-weight:bold;letter-spacing:4px;color:#00eaff}
-.status{font-size:12px;color:#64efff}
-main{
-max-width:760px;margin:auto;padding:20px;
-text-align:center;
+
+h1{
+    text-align:center;
+    color:#00eaff;
+    letter-spacing:8px;
+    text-shadow:0 0 25px #00eaff;
+    margin:20px 0 5px;
 }
-.orb{
-width:190px;height:190px;margin:35px auto;
-border-radius:50%;
-border:2px solid #00eaff;
-box-shadow:0 0 30px #00eaff,0 0 90px #0066ff88;
-display:grid;place-items:center;
-animation:pulse 2s infinite;
+
+.subtitle{
+    text-align:center;
+    color:#72cfff;
+    margin-bottom:25px;
 }
-.orb span{
-width:70px;height:70px;border-radius:50%;
-background:#00eaff;
-box-shadow:0 0 35px #00eaff;
+
+.core{
+    width:190px;
+    height:190px;
+    border:3px solid #00eaff;
+    border-radius:50%;
+    margin:20px auto;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    box-shadow:0 0 20px #00eaff,0 0 60px #006eff55;
+    transition:.3s;
 }
-@keyframes pulse{
-50%{transform:scale(1.06);box-shadow:0 0 55px #00eaff,0 0 120px #0066ff}
+
+.core.active{
+    transform:scale(1.08);
+    box-shadow:0 0 30px #00eaff,0 0 90px #00eaff99;
 }
-h1{letter-spacing:5px}
-#durum{color:#75edff;margin:15px}
-#cevap{
-min-height:80px;padding:18px;margin:20px 0;
-border:1px solid #00eaff33;border-radius:15px;
-background:#06111e;color:#fff;line-height:1.5;
+
+.core span{
+    width:65px;
+    height:65px;
+    border:3px solid #00eaff;
+    border-radius:50%;
+    background:#00eaff;
+    box-shadow:0 0 25px #00eaff;
 }
-.controls{display:flex;gap:8px}
-input{
-flex:1;padding:15px;border-radius:12px;
-border:1px solid #00eaff55;background:#071523;
-color:#fff;font-size:16px;outline:none;
-}
+
 button{
-padding:14px 18px;border-radius:12px;
-border:1px solid #00eaff88;
-background:#062335;color:#9ff7ff;
-font-size:18px;
+    border:2px solid #00eaff;
+    background:#061728;
+    color:#00eaff;
+    padding:14px 22px;
+    border-radius:15px;
+    font-size:17px;
+    cursor:pointer;
+    box-shadow:0 0 15px #00eaff55;
 }
-#log{
-margin-top:18px;text-align:left;
-font-size:13px;color:#78aebc;
-max-height:130px;overflow:auto;
+
+button:active{
+    transform:scale(.97);
+}
+
+.controls{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.status{
+    text-align:center;
+    margin:18px;
+    color:#71eaff;
+}
+
+.chat{
+    background:#06111e;
+    border:1px solid #00eaff55;
+    border-radius:18px;
+    padding:18px;
+    min-height:180px;
+    box-shadow:0 0 20px #00eaff15;
+}
+
+.message{
+    margin:10px 0;
+    padding:12px 15px;
+    border-radius:12px;
+    line-height:1.5;
+}
+
+.user{
+    background:#0b2940;
+    text-align:right;
+}
+
+.ai{
+    background:#071b29;
+    border-left:3px solid #00eaff;
+}
+
+.inputArea{
+    display:flex;
+    gap:8px;
+    margin-top:15px;
+}
+
+input{
+    flex:1;
+    min-width:0;
+    padding:14px;
+    border-radius:12px;
+    border:1px solid #00eaff77;
+    background:#030b14;
+    color:white;
+    font-size:16px;
+    outline:none;
+}
+
+.commands{
+    margin-top:20px;
+    color:#8edfff;
+    font-size:14px;
+    line-height:1.7;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-<div class="logo">BARAN AI</div>
-<div class="status" id="status">● ONLINE</div>
-</header>
+<div class="app">
 
-<main>
+<h1>BARAN AI</h1>
+<div class="subtitle">Kişisel sesli asistan</div>
 
-<div class="orb"><span></span></div>
-
-<h1>MERHABA BARAN</h1>
-
-<div id="durum">Sistemler hazır.</div>
-
-<div id="cevap">
-Merhaba Baran. Seni dinlemeye hazırım.
+<div id="core" class="core">
+    <span></span>
 </div>
 
 <div class="controls">
-<input id="input" placeholder="Komutunu yaz...">
-<button onclick="gonder()">➤</button>
-<button onclick="dinle()">🎙</button>
+    <button onclick="dinle()">🎙️ DİNLE</button>
+    <button onclick="durdur()">⏹️ DURDUR</button>
 </div>
 
-<div id="log"></div>
+<div id="status" class="status">Hazır...</div>
 
-</main>
+<div id="chat" class="chat">
+    <div class="message ai">
+        Merhaba. Ben BARAN AI. Nasıl yardımcı olabilirim?
+    </div>
+</div>
+
+<div class="inputArea">
+    <input id="input" placeholder="Komutunu yaz veya konuş...">
+    <button onclick="gonder()">Gönder</button>
+</div>
+
+<div class="commands">
+<b>Örnek komutlar:</b><br>
+• Merhaba<br>
+• Nasılsın?<br>
+• Saat kaç?<br>
+• Bugün günlerden ne?<br>
+• 25 çarpı 8 hesapla<br>
+• Google'da yapay zeka ara<br>
+• YouTube'da müzik aç<br>
+• YouTube'da teknoloji videoları ara<br>
+• Google Haritalar'ı aç<br>
+• Haberleri ara<br>
+• Wikipedia'da bilgisayar ara
+</div>
+
+</div>
 
 <script>
 
-const input=document.getElementById("input");
-const cevap=document.getElementById("cevap");
-const durum=document.getElementById("durum");
-const status=document.getElementById("status");
-const log=document.getElementById("log");
+let recognition = null;
+let konusuyor = false;
+
+const statusEl = document.getElementById("status");
+const chat = document.getElementById("chat");
+const core = document.getElementById("core");
+const input = document.getElementById("input");
 
 
-function yaz(metin){
+// -----------------------------
+// EKRANA MESAJ EKLE
+// -----------------------------
 
-cevap.innerText=metin;
+function mesaj(metin, tip="ai"){
 
-log.innerHTML=
-"<div>› "+metin+"</div>"+log.innerHTML;
+    const div = document.createElement("div");
 
+    div.className = "message " + tip;
+
+    div.textContent = metin;
+
+    chat.appendChild(div);
+
+    chat.scrollTop = chat.scrollHeight;
 }
 
+
+// -----------------------------
+// SESLİ CEVAP
+// -----------------------------
 
 function konus(metin){
 
-yaz(metin);
+    mesaj(metin,"ai");
 
-if("speechSynthesis" in window){
+    if(!("speechSynthesis" in window)){
+        return;
+    }
 
-speechSynthesis.cancel();
+    speechSynthesis.cancel();
 
-const ses=new SpeechSynthesisUtterance(metin);
+    const ses = new SpeechSynthesisUtterance(metin);
 
-ses.lang="tr-TR";
-ses.rate=.95;
-ses.pitch=1;
+    ses.lang = "tr-TR";
+    ses.rate = 1;
+    ses.pitch = 1;
 
-speechSynthesis.speak(ses);
-
-}
-
-}
-
-
-function gonder(){
-
-let komut=input.value.trim();
-
-if(!komut)return;
-
-input.value="";
-
-komutCalistir(komut);
-
+    speechSynthesis.speak(ses);
 }
 
 
-input.addEventListener("keydown",function(e){
+// -----------------------------
+// TÜRKÇE KOMUTU NORMALLEŞTİR
+// -----------------------------
 
-if(e.key==="Enter")gonder();
+function temizle(metin){
 
-});
-
-
-function komutCalistir(komut){
-
-let k=komut.toLowerCase().trim();
-
-
-if(k.includes("merhaba")||k.includes("selam")){
-
-konus("Merhaba Baran. Sistemlerim tamamen hazır.");
-
-return;
-
+    return metin
+        .toLocaleLowerCase("tr-TR")
+        .trim();
 }
 
 
-if(k.includes("nasılsın")||k.includes("nasilsin")){
+// -----------------------------
+// SAAT
+// -----------------------------
 
-konus("Teşekkür ederim Baran. Sistemlerim çalışıyor.");
+function saat(){
 
-return;
+    const simdi = new Date();
 
+    return simdi.toLocaleTimeString("tr-TR",{
+        hour:"2-digit",
+        minute:"2-digit"
+    });
 }
 
 
-if(k.includes("saat")){
+// -----------------------------
+// TARİH
+// -----------------------------
 
-let saat=new Date().toLocaleTimeString(
-"tr-TR",
-{hour:"2-digit",minute:"2-digit"}
-);
+function tarih(){
 
-konus("Şu an saat "+saat);
+    const simdi = new Date();
 
-return;
-
+    return simdi.toLocaleDateString("tr-TR",{
+        weekday:"long",
+        day:"numeric",
+        month:"long",
+        year:"numeric"
+    });
 }
 
 
-if(k.includes("tarih")||
-k.includes("bugün günlerden ne")||
-k.includes("bugun gunlerden ne")){
+// -----------------------------
+// ARAMA
+// -----------------------------
 
-let tarih=new Date().toLocaleDateString(
-"tr-TR",
-{
-weekday:"long",
-day:"numeric",
-month:"long",
-year:"numeric"
-}
-);
+function googleAra(sorgu){
 
-konus("Bugün "+tarih);
+    const url =
+        "https://www.google.com/search?q=" +
+        encodeURIComponent(sorgu);
 
-return;
-
+    window.open(url,"_blank");
 }
 
 
-if(k.includes("youtube")){
+function youtubeAra(sorgu){
 
-konus("YouTube'u açıyorum.");
+    const url =
+        "https://www.youtube.com/results?search_query=" +
+        encodeURIComponent(sorgu);
 
-setTimeout(()=>{
-
-window.open(
-"https://www.youtube.com",
-"_blank"
-);
-
-},600);
-
-return;
-
+    window.open(url,"_blank");
 }
 
 
-if(k.includes("google")){
+function haritaAra(sorgu){
 
-let arama=k
-.replace("google'da","")
-.replace("googleda","")
-.replace("google","")
-.replace("ara","")
-.trim();
+    const url =
+        "https://www.google.com/maps/search/" +
+        encodeURIComponent(sorgu);
 
-if(!arama){
-
-konus("Google'da ne aramamı istediğini söyle.");
-
-return;
-
-}
-
-konus(arama+" için Google'da arama yapıyorum.");
-
-setTimeout(()=>{
-
-window.open(
-"https://www.google.com/search?q="+
-encodeURIComponent(arama),
-"_blank"
-);
-
-},600);
-
-return;
-
+    window.open(url,"_blank");
 }
 
 
-if(k.includes("harita")||
-k.includes("konum")){
+function wikipediaAra(sorgu){
 
-konus("Haritaları açıyorum.");
+    const url =
+        "https://tr.wikipedia.org/wiki/" +
+        encodeURIComponent(sorgu);
 
-setTimeout(()=>{
-
-window.open(
-"https://www.google.com/maps",
-"_blank"
-);
-
-},600);
-
-return;
-
+    window.open(url,"_blank");
 }
 
 
-if(k.includes("hesapla")||
-k.includes("kaç eder")||
-k.includes("kac eder")){
+// -----------------------------
+// BASİT HESAP MAKİNESİ
+// -----------------------------
 
-let ifade=k
-.replace("hesapla","")
-.replace("kaç eder","")
-.replace("kac eder","")
-.replace(/artı/g,"+")
-.replace(/arti/g,"+")
-.replace(/eksi/g,"-")
-.replace(/çarpı/g,"*")
-.replace(/carpi/g,"*")
-.replace(/bölü/g,"/")
-.replace(/bolu/g,"/")
-.trim();
+function hesapla(metin){
 
-if(/^[0-9+\-*/().\s]+$/.test(ifade)){
+    let ifade = metin
+        .replaceAll("çarpı","*")
+        .replaceAll("çarp","*")
+        .replaceAll("kere","*")
+        .replaceAll("bölü","/")
+        .replaceAll("artı","+")
+        .replaceAll("eksi","-")
+        .replaceAll("topla","+")
+        .replaceAll("çıkar","-");
 
-try{
+    ifade = ifade.replace(/[^0-9+\-*/().,% ]/g,"");
 
-let sonuc=Function(
-'"use strict";return ('+ifade+')'
-)();
+    ifade = ifade.replaceAll("%","/100");
 
-konus("Sonuç "+sonuc);
+    if(!/[0-9]/.test(ifade)){
+        return null;
+    }
 
-}catch{
+    try{
 
-konus("Bu işlemi hesaplayamadım.");
+        const sonuc = Function(
+            '"use strict"; return (' + ifade + ')'
+        )();
 
-}
+        if(Number.isFinite(sonuc)){
+            return sonuc;
+        }
 
-}else{
+    }catch(e){}
 
-konus("Örneğin 25 artı 15 kaç eder diyebilirsin.");
-
-}
-
-return;
-
+    return null;
 }
 
 
-if(k.includes("yardım")||k.includes("yardim")){
+// -----------------------------
+// KOMUT MOTORU
+// -----------------------------
 
-konus(
-"Şunları deneyebilirsin: saat kaç, bugün günlerden ne, " +
-"YouTube aç, Google'da ara, harita aç veya hesaplama yap."
-);
+function komutCalistir(girdi){
 
-return;
+    const komut = temizle(girdi);
 
+    mesaj(girdi,"user");
+
+
+    // MERHABA
+
+    if(
+        komut.includes("merhaba") ||
+        komut.includes("selam")
+    ){
+
+        konus(
+            "Merhaba. Buradayım. " +
+            "Size nasıl yardımcı olabilirim?"
+        );
+
+        return;
+    }
+
+
+    // NASILSIN
+
+    if(
+        komut.includes("nasılsın") ||
+        komut.includes("nasilsin")
+    ){
+
+        konus(
+            "Teşekkür ederim. Sistemlerim hazır. " +
+            "Komutunuzu bekliyorum."
+        );
+
+        return;
+    }
+
+
+    // KİMSİN
+
+    if(
+        komut.includes("kimsin") ||
+        komut.includes("sen nesin")
+    ){
+
+        konus(
+            "Ben BARAN AI. " +
+            "Tarayıcı üzerinde çalışan kişisel sesli asistanınım."
+        );
+
+        return;
+    }
+
+
+    // SAAT
+
+    if(komut.includes("saat")){
+
+        konus("Şu an saat " + saat());
+
+        return;
+    }
+
+
+    // TARİH
+
+    if(
+        komut.includes("bugün") ||
+        komut.includes("tarih") ||
+        komut.includes("hangi gün")
+    ){
+
+        konus("Bugün " + tarih());
+
+        return;
+    }
+
+
+    // GOOGLE
+
+    if(
+        komut.includes("google'da") ||
+        komut.includes("google da") ||
+        komut.startsWith("google")
+    ){
+
+        let sorgu = komut
+            .replace("google'da","")
+            .replace("google da","")
+            .replace("google","")
+            .replace("ara","")
+            .trim();
+
+        if(!sorgu){
+
+            konus("Google'da ne aramamı istersin?");
+
+            return;
+        }
+
+        konus(
+            "Google'da " +
+            sorgu +
+            " aramasını açıyorum."
+        );
+
+        googleAra(sorgu);
+
+        return;
+    }
+
+
+    // YOUTUBE
+
+    if(
+        komut.includes("youtube") ||
+        komut.includes("youtube'da")
+    ){
+
+        let sorgu = komut
+            .replace("youtube'da","")
+            .replace("youtube da","")
+            .replace("youtube","")
+            .replace("aç","")
+            .replace("ara","")
+            .trim();
+
+        if(!sorgu){
+            sorgu = "müzik";
+        }
+
+        konus(
+            "YouTube'da " +
+            sorgu +
+            " arıyorum."
+        );
+
+        youtubeAra(sorgu);
+
+        return;
+    }
+
+
+    // HARİTA
+
+    if(
+        komut.includes("harita") ||
+        komut.includes("haritalar")
+    ){
+
+        let sorgu = komut
+            .replace("google haritalar","")
+            .replace("haritalar","")
+            .replace("harita","")
+            .replace("aç","")
+            .trim();
+
+        if(!sorgu){
+            sorgu = "yakınımdaki yerler";
+        }
+
+        konus("Haritaları açıyorum.");
+
+        haritaAra(sorgu);
+
+        return;
+    }
+
+
+    // WIKIPEDIA
+
+    if(
+        komut.includes("wikipedia") ||
+        komut.includes("vikipedi")
+    ){
+
+        let sorgu = komut
+            .replace("wikipedia","")
+            .replace("vikipedi","")
+            .replace("ara","")
+            .trim();
+
+        if(!sorgu){
+
+            konus(
+                "Wikipedia'da ne aramamı istersin?"
+            );
+
+            return;
+        }
+
+        konus(
+            "Wikipedia'da " +
+            sorgu +
+            " sayfasını açıyorum."
+        );
+
+        wikipediaAra(sorgu);
+
+        return;
+    }
+
+
+    // HESAPLAMA
+
+    if(
+        komut.includes("hesapla") ||
+        komut.includes("kaç eder") ||
+        /[0-9]+\s*(artı|eksi|çarpı|bölü|\+|\-|\*|\/)/.test(komut)
+    ){
+
+        const sonuc = hesapla(komut);
+
+        if(sonuc !== null){
+
+            konus(
+                "Sonuç " +
+                sonuc
+            );
+
+            return;
+        }
+    }
+
+
+    // HABER
+
+    if(
+        komut.includes("haber") ||
+        komut.includes("haberleri")
+    ){
+
+        konus("Güncel haberleri Google'da açıyorum.");
+
+        googleAra("son dakika haberleri");
+
+        return;
+    }
+
+
+    // HAVA DURUMU
+
+    if(
+        komut.includes("hava durumu") ||
+        komut.includes("hava nasıl")
+    ){
+
+        konus(
+            "Hava durumunu öğrenmek için " +
+            "Google aramasını açıyorum."
+        );
+
+        googleAra("hava durumu");
+
+        return;
+    }
+
+
+    // E-POSTA
+
+    if(
+        komut.includes("gmail") ||
+        komut.includes("mail")
+    ){
+
+        konus("Gmail'i açıyorum.");
+
+        window.open(
+            "https://mail.google.com/",
+            "_blank"
+        );
+
+        return;
+    }
+
+
+    // BİLİNMEYEN KOMUT
+
+    konus(
+        "Komutunu duydum: " +
+        girdi +
+        ". Bu komut için henüz özel bir yeteneğim yok. " +
+        "İstersen Google'da arayabilirim."
+    );
 }
 
 
-if(k.includes("yenile")){
-
-konus("Sayfayı yeniliyorum.");
-
-setTimeout(()=>location.reload(),900);
-
-return;
-
-}
-
-
-konus(
-"Komutunu aldım: "+komut+
-". Bu komut için henüz özel bir işlem tanımlı değil."
-);
-
-}
-
+// -----------------------------
+// SESLİ DİNLEME
+// -----------------------------
 
 function dinle(){
 
-const SR=
-window.SpeechRecognition||
-window.webkitSpeechRecognition;
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if(!SpeechRecognition){
+
+        konus(
+            "Bu tarayıcı sesli komut özelliğini desteklemiyor."
+        );
+
+        return;
+    }
 
 
-if(!SR){
+    if(recognition){
 
-konus("Bu tarayıcı sesli komutu desteklemiyor.");
+        try{
+            recognition.stop();
+        }catch(e){}
 
-return;
+    }
 
+
+    recognition = new SpeechRecognition();
+
+    recognition.lang = "tr-TR";
+
+    recognition.continuous = false;
+
+    recognition.interimResults = false;
+
+
+    recognition.onstart = function(){
+
+        konusuyor = true;
+
+        core.classList.add("active");
+
+        statusEl.textContent =
+            "🎙️ Dinliyorum...";
+
+    };
+
+
+    recognition.onresult = function(event){
+
+        const komut =
+            event.results[0][0].transcript;
+
+        statusEl.textContent =
+            "Komut alındı.";
+
+        komutCalistir(komut);
+    };
+
+
+    recognition.onerror = function(){
+
+        statusEl.textContent =
+            "Ses alınamadı. Tekrar deneyin.";
+
+        core.classList.remove("active");
+
+        konusuyor = false;
+    };
+
+
+    recognition.onend = function(){
+
+        core.classList.remove("active");
+
+        konusuyor = false;
+
+        if(
+            statusEl.textContent ===
+            "🎙️ Dinliyorum..."
+        ){
+            statusEl.textContent =
+                "Hazır...";
+        }
+    };
+
+
+    try{
+
+        recognition.start();
+
+    }catch(e){
+
+        statusEl.textContent =
+            "Dinleme başlatılamadı.";
+    }
 }
 
 
-const r=new SR();
+// -----------------------------
+// DİNLEMEYİ DURDUR
+// -----------------------------
 
-r.lang="tr-TR";
-r.continuous=false;
-r.interimResults=false;
+function durdur(){
 
+    if(recognition){
 
-r.onstart=function(){
+        try{
+            recognition.stop();
+        }catch(e){}
 
-durum.innerText="🎙 Dinliyorum...";
-status.innerText="● DİNLİYOR";
+    }
 
-};
+    speechSynthesis.cancel();
 
+    core.classList.remove("active");
 
-r.onresult=function(event){
-
-const metin=
-event.results[0][0].transcript;
-
-durum.innerText="Komut alındı.";
-
-komutCalistir(metin);
-
-};
-
-
-r.onerror=function(){
-
-durum.innerText="Ses algılanamadı.";
-status.innerText="● ONLINE";
-
-};
-
-
-r.onend=function(){
-
-status.innerText="● ONLINE";
-
-setTimeout(()=>{
-
-durum.innerText="Sistemler hazır.";
-
-},500);
-
-};
-
-
-r.start();
-
+    statusEl.textContent =
+        "Durduruldu.";
 }
+
+
+// -----------------------------
+// YAZILI KOMUT
+// -----------------------------
+
+function gonder(){
+
+    const metin = input.value.trim();
+
+    if(!metin){
+        return;
+    }
+
+    input.value = "";
+
+    komutCalistir(metin);
+}
+
+
+input.addEventListener(
+    "keydown",
+    function(event){
+
+        if(event.key === "Enter"){
+            gonder();
+        }
+
+    }
+);
+
+
+// -----------------------------
+// BAŞLANGIÇ
+// -----------------------------
+
+window.addEventListener(
+    "load",
+    function(){
+
+        setTimeout(function(){
+
+            konus(
+                "BARAN AI hazır. " +
+                "Sesli veya yazılı bir komut verebilirsin."
+            );
+
+        },500);
+
+    }
+);
 
 </script>
 
