@@ -122,7 +122,13 @@ function dinle(){
 
     recognition.lang="tr-TR";
     recognition.continuous=false;
-    recognition.interimResults=false;
+    
+recognition.onstart=function(){
+    document.getElementById("durum").innerText="Dinliyorum...";
+};
+
+recognition.interimResults=false;
+
 
     document.getElementById("durum").innerText="Dinliyorum...";
 
