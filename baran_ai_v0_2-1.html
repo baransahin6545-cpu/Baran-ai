@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Baran AI v0.2</title>
+<style>
+body{margin:0;background:#050910;color:#eef7ff;font-family:Arial,sans-serif;display:flex;justify-content:center;min-height:100vh}
+.box{width:min(92vw,520px);text-align:center;padding:34px 0}
+h1{font-size:40px;letter-spacing:4px;margin:10px 0}.sub{opacity:.65}
+.orb{width:150px;height:150px;border-radius:50%;margin:32px auto;border:2px solid #50d8ff;box-shadow:0 0 30px #1686b8,inset 0 0 25px #123747;display:flex;align-items:center;justify-content:center;font-size:48px}
+button{border:0;border-radius:14px;padding:15px 22px;font-size:17px;background:#17394b;color:#fff;margin:5px;cursor:pointer}
+#status{min-height:28px;margin:18px 0;color:#8fe8ff}
+#log{background:#0c141f;border:1px solid #253649;border-radius:14px;padding:15px;text-align:left;min-height:85px;white-space:pre-wrap}
+.note{font-size:13px;opacity:.6;line-height:1.5;margin-top:15px}
+</style>
+</head>
+<body><div class="box">
+<h1>BARAN AI</h1><div class="sub">Telefon prototipi • v0.2</div>
+<div class="orb">◉</div>
+<button id="listen">🎙️ Dinle</button><button id="stop">⏹ Durdur</button>
+<div id="status">Hazır.</div><div id="log">Komut geçmişi burada görünecek.</div>
+<div class="note">İlk kullanımda mikrofon izni ver. Chrome ile açman önerilir.</div>
+</div>
+<script>
+const statusEl=document.getElementById("status"),logEl=document.getElementById("log");
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let rec=null;
+function speak(t){if(!("speechSynthesis"in window))return;speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang="tr-TR";u.rate=.95;speechSynthesis.speak(u)}
+function reply(t){logEl.textContent+="\\nBaran AI: "+t;statusEl.textContent=t;speak(t)}
+function command(t){
+ logEl.textContent="Sen: "+t;
+ let x=t.toLowerCase();
+ if(x.includes("merhaba")||x.includes("selam")) reply("Merhaba Baran. Hazırım.");
+ else if(x.includes("saat")){let d=new Date();reply("Şu an saat "+d.toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"})+".")}
+ else if(x.includes("youtube")){reply("YouTube'u açıyorum.");setTimeout(()=>location.href="https://www.youtube.com/",600)}
+ else if(x.includes("google")){let q=x.replace(/google'?da|google/gi,"").replace(/ara/gi,"").trim();reply(q?"Google'da arıyorum.":"Google'ı açıyorum.");setTimeout(()=>location.href="https://www.google.com/search?q="+encodeURIComponent(q),700)}
+ else reply("Bu komutu henüz bilmiyorum. İlk sürümdeyiz.");
+}
+async function start(){
+ if(!SR){statusEl.textContent="Bu tarayıcı ses tanımayı desteklemiyor. Chrome ile dene.";return}
+ try{
+   if(navigator.mediaDevices?.getUserMedia) await navigator.mediaDevices.getUserMedia({audio:true});
+ }catch(e){statusEl.textContent="Mikrofon izni verilmedi. Tarayıcı ayarlarından Mikrofon iznini aç.";return}
+ rec=new SR();rec.lang="tr-TR";rec.interimResults=false;rec.continuous=false;
+ rec.onstart=()=>statusEl.textContent="Dinliyorum...";
+ rec.onresult=e=>command(e.results[0][0].transcript);
+ rec.onerror=e=>statusEl.textContent="Ses algılanamadı: "+e.error;
+ rec.onend=()=>{if(statusEl.textContent==="Dinliyorum...")statusEl.textContent="Hazır."};
+ try{rec.start()}catch(e){statusEl.textContent="Dinleme başlatılamadı. Tekrar dene."}
+}
+listen.onclick=start;
+stop.onclick=()=>{if(rec)rec.stop();if("speechSynthesis"in window)speechSynthesis.cancel();statusEl.textContent="Durduruldu."}
+</script></body></html>
