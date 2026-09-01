@@ -107,7 +107,7 @@ function konus(metin){
     }
 }
 
-function dinle(){
+function dinle( ){
 
     const SpeechRecognition =
         window.SpeechRecognition ||
@@ -167,7 +167,65 @@ recognition.interimResults=false;
     recognition.onend=function(){
         document.getElementById("durum").innerText="Hazır...";
     };
-}
+}function yeniDinle(){
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if(!SpeechRecognition){
+        konus("Tarayıcınız sesli komutu desteklemiyor.");
+        return;
+    }
+
+    const r = new SpeechRecognition();
+    r.lang = "tr-TR";
+    r.continuous = false;
+    r.interimResults = false;
+
+    document.getElementById("durum").innerText = "Dinliyorum...";
+
+    r.onresult = function(event){
+        const komut = event.results[0][0].transcript
+            .toLowerCase()
+            .trim();
+
+        document.getElementById("durum").innerText =
+            "Sen: " + komut;
+
+        if(komut.includes("merhaba")){
+            konus("Merhaba Baran. Sistemlerim hazır.");
+        }
+        else if(komut.includes("nasılsın")){
+            konus("Teşekkür ederim Baran. Gayet iyiyim.");
+        }
+        else if(komut.includes("saat")){
+            const saat = new Date().toLocaleTimeString("tr-TR");
+            konus("Şu an saat " + saat);
+        }
+        else if(komut.includes("youtube")){
+            konus("YouTube'u açıyorum.");
+            window.open("https://www.youtube.com", "_blank");
+        }
+        else if(komut.includes("google")){
+            konus("Google'ı açıyorum.");
+            window.open("https://www.google.com", "_blank");
+        }
+        else if(komut.includes("yardım")){
+            konus("Merhaba, saat, YouTube, Google veya nasılsın diyebilirsin.");
+        }
+        else{
+            konus("Komutunuzu duydum: " + komut);
+        }
+    };
+
+    r.onerror = function(){
+        document.getElementById("durum").innerText =
+            "Ses anlaşılamadı. Tekrar deneyin.";
+    };
+
+    r.start();
+                  }
+    
 </script>
 
 </body>
