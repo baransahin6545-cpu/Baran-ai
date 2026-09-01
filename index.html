@@ -2,230 +2,431 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BARAN AI</title>
 
 <style>
+*{box-sizing:border-box}
 body{
-    margin:0;
-    background:#050b14;
-    color:#00eaff;
-    font-family:Arial,sans-serif;
-    text-align:center;
+margin:0;background:#020711;color:#dffcff;
+font-family:Arial,sans-serif;min-height:100vh;
 }
-
-.container{
-    padding:35px 20px;
+header{
+height:65px;padding:0 18px;display:flex;
+align-items:center;justify-content:space-between;
+border-bottom:1px solid #00eaff44;
+background:#020914;
 }
-
-h1{
-    font-size:42px;
-    letter-spacing:5px;
-    text-shadow:0 0 20px #00eaff;
+.logo{font-weight:bold;letter-spacing:4px;color:#00eaff}
+.status{font-size:12px;color:#64efff}
+main{
+max-width:760px;margin:auto;padding:20px;
+text-align:center;
 }
-
-#orb{
-    width:180px;
-    height:180px;
-    margin:45px auto 30px;
-    border:3px solid #00eaff;
-    border-radius:50%;
-    box-shadow:0 0 25px #00eaff,0 0 70px #0066ff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:70px;
-    animation:pulse 2s infinite;
+.orb{
+width:190px;height:190px;margin:35px auto;
+border-radius:50%;
+border:2px solid #00eaff;
+box-shadow:0 0 30px #00eaff,0 0 90px #0066ff88;
+display:grid;place-items:center;
+animation:pulse 2s infinite;
 }
-
+.orb span{
+width:70px;height:70px;border-radius:50%;
+background:#00eaff;
+box-shadow:0 0 35px #00eaff;
+}
 @keyframes pulse{
-    50%{
-        transform:scale(1.08);
-        box-shadow:0 0 50px #00eaff,0 0 100px #0066ff;
-    }
+50%{transform:scale(1.06);box-shadow:0 0 55px #00eaff,0 0 120px #0066ff}
 }
-
-button{
-    background:#061522;
-    color:#00eaff;
-    border:2px solid #00eaff;
-    border-radius:12px;
-    padding:15px 30px;
-    font-size:20px;
-    box-shadow:0 0 15px #00eaff;
-}
-
-button:active{
-    transform:scale(.95);
-}
-
-#durum{
-    margin-top:25px;
-    font-size:18px;
-}
-
+h1{letter-spacing:5px}
+#durum{color:#75edff;margin:15px}
 #cevap{
-    margin:30px auto;
-    max-width:600px;
-    min-height:50px;
-    padding:20px;
-    border:1px solid #075d78;
-    border-radius:15px;
-    background:#07121e;
-    color:white;
+min-height:80px;padding:18px;margin:20px 0;
+border:1px solid #00eaff33;border-radius:15px;
+background:#06111e;color:#fff;line-height:1.5;
+}
+.controls{display:flex;gap:8px}
+input{
+flex:1;padding:15px;border-radius:12px;
+border:1px solid #00eaff55;background:#071523;
+color:#fff;font-size:16px;outline:none;
+}
+button{
+padding:14px 18px;border-radius:12px;
+border:1px solid #00eaff88;
+background:#062335;color:#9ff7ff;
+font-size:18px;
+}
+#log{
+margin-top:18px;text-align:left;
+font-size:13px;color:#78aebc;
+max-height:130px;overflow:auto;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<header>
+<div class="logo">BARAN AI</div>
+<div class="status" id="status">● ONLINE</div>
+</header>
 
-<h1>BARAN AI</h1>
+<main>
 
-<div id="orb">◉</div>
+<div class="orb"><span></span></div>
 
-<button onclick="dinle()">🎙️ DİNLE</button>
+<h1>MERHABA BARAN</h1>
 
-<div id="durum">Hazır...</div>
+<div id="durum">Sistemler hazır.</div>
 
 <div id="cevap">
-Merhaba Baran. Ben hazırım.
+Merhaba Baran. Seni dinlemeye hazırım.
 </div>
 
+<div class="controls">
+<input id="input" placeholder="Komutunu yaz...">
+<button onclick="gonder()">➤</button>
+<button onclick="dinle()">🎙</button>
 </div>
+
+<div id="log"></div>
+
+</main>
 
 <script>
-function konus(metin){
-    document.getElementById("cevap").innerText=metin;
 
-    if("speechSynthesis" in window){
-        let ses=new SpeechSynthesisUtterance(metin);
-        ses.lang="tr-TR";
-        ses.rate=1;
-        speechSynthesis.speak(ses);
-    }
+const input=document.getElementById("input");
+const cevap=document.getElementById("cevap");
+const durum=document.getElementById("durum");
+const status=document.getElementById("status");
+const log=document.getElementById("log");
+
+
+function yaz(metin){
+
+cevap.innerText=metin;
+
+log.innerHTML=
+"<div>› "+metin+"</div>"+log.innerHTML;
+
 }
 
-function dinle( ){
 
-    const SpeechRecognition =
-        window.SpeechRecognition ||
-        window.webkitSpeechRecognition;
+function konus(metin){
 
-    if(!SpeechRecognition){
-        konus("Tarayıcınız sesli komutu desteklemiyor.");
-        return;
-    }
+yaz(metin);
 
-    let recognition=new SpeechRecognition();
+if("speechSynthesis" in window){
 
-    recognition.lang="tr-TR";
-    recognition.continuous=false;
-    
-recognition.onstart=function(){
-    document.getElementById("durum").innerText="Dinliyorum...";
+speechSynthesis.cancel();
+
+const ses=new SpeechSynthesisUtterance(metin);
+
+ses.lang="tr-TR";
+ses.rate=.95;
+ses.pitch=1;
+
+speechSynthesis.speak(ses);
+
+}
+
+}
+
+
+function gonder(){
+
+let komut=input.value.trim();
+
+if(!komut)return;
+
+input.value="";
+
+komutCalistir(komut);
+
+}
+
+
+input.addEventListener("keydown",function(e){
+
+if(e.key==="Enter")gonder();
+
+});
+
+
+function komutCalistir(komut){
+
+let k=komut.toLowerCase().trim();
+
+
+if(k.includes("merhaba")||k.includes("selam")){
+
+konus("Merhaba Baran. Sistemlerim tamamen hazır.");
+
+return;
+
+}
+
+
+if(k.includes("nasılsın")||k.includes("nasilsin")){
+
+konus("Teşekkür ederim Baran. Sistemlerim çalışıyor.");
+
+return;
+
+}
+
+
+if(k.includes("saat")){
+
+let saat=new Date().toLocaleTimeString(
+"tr-TR",
+{hour:"2-digit",minute:"2-digit"}
+);
+
+konus("Şu an saat "+saat);
+
+return;
+
+}
+
+
+if(k.includes("tarih")||
+k.includes("bugün günlerden ne")||
+k.includes("bugun gunlerden ne")){
+
+let tarih=new Date().toLocaleDateString(
+"tr-TR",
+{
+weekday:"long",
+day:"numeric",
+month:"long",
+year:"numeric"
+}
+);
+
+konus("Bugün "+tarih);
+
+return;
+
+}
+
+
+if(k.includes("youtube")){
+
+konus("YouTube'u açıyorum.");
+
+setTimeout(()=>{
+
+window.open(
+"https://www.youtube.com",
+"_blank"
+);
+
+},600);
+
+return;
+
+}
+
+
+if(k.includes("google")){
+
+let arama=k
+.replace("google'da","")
+.replace("googleda","")
+.replace("google","")
+.replace("ara","")
+.trim();
+
+if(!arama){
+
+konus("Google'da ne aramamı istediğini söyle.");
+
+return;
+
+}
+
+konus(arama+" için Google'da arama yapıyorum.");
+
+setTimeout(()=>{
+
+window.open(
+"https://www.google.com/search?q="+
+encodeURIComponent(arama),
+"_blank"
+);
+
+},600);
+
+return;
+
+}
+
+
+if(k.includes("harita")||
+k.includes("konum")){
+
+konus("Haritaları açıyorum.");
+
+setTimeout(()=>{
+
+window.open(
+"https://www.google.com/maps",
+"_blank"
+);
+
+},600);
+
+return;
+
+}
+
+
+if(k.includes("hesapla")||
+k.includes("kaç eder")||
+k.includes("kac eder")){
+
+let ifade=k
+.replace("hesapla","")
+.replace("kaç eder","")
+.replace("kac eder","")
+.replace(/artı/g,"+")
+.replace(/arti/g,"+")
+.replace(/eksi/g,"-")
+.replace(/çarpı/g,"*")
+.replace(/carpi/g,"*")
+.replace(/bölü/g,"/")
+.replace(/bolu/g,"/")
+.trim();
+
+if(/^[0-9+\-*/().\s]+$/.test(ifade)){
+
+try{
+
+let sonuc=Function(
+'"use strict";return ('+ifade+')'
+)();
+
+konus("Sonuç "+sonuc);
+
+}catch{
+
+konus("Bu işlemi hesaplayamadım.");
+
+}
+
+}else{
+
+konus("Örneğin 25 artı 15 kaç eder diyebilirsin.");
+
+}
+
+return;
+
+}
+
+
+if(k.includes("yardım")||k.includes("yardim")){
+
+konus(
+"Şunları deneyebilirsin: saat kaç, bugün günlerden ne, " +
+"YouTube aç, Google'da ara, harita aç veya hesaplama yap."
+);
+
+return;
+
+}
+
+
+if(k.includes("yenile")){
+
+konus("Sayfayı yeniliyorum.");
+
+setTimeout(()=>location.reload(),900);
+
+return;
+
+}
+
+
+konus(
+"Komutunu aldım: "+komut+
+". Bu komut için henüz özel bir işlem tanımlı değil."
+);
+
+}
+
+
+function dinle(){
+
+const SR=
+window.SpeechRecognition||
+window.webkitSpeechRecognition;
+
+
+if(!SR){
+
+konus("Bu tarayıcı sesli komutu desteklemiyor.");
+
+return;
+
+}
+
+
+const r=new SR();
+
+r.lang="tr-TR";
+r.continuous=false;
+r.interimResults=false;
+
+
+r.onstart=function(){
+
+durum.innerText="🎙 Dinliyorum...";
+status.innerText="● DİNLİYOR";
+
 };
 
-recognition.interimResults=false;
+
+r.onresult=function(event){
+
+const metin=
+event.results[0][0].transcript;
+
+durum.innerText="Komut alındı.";
+
+komutCalistir(metin);
+
+};
 
 
-    document.getElementById("durum").innerText="Dinliyorum...";
+r.onerror=function(){
 
-    recognition.start();
+durum.innerText="Ses algılanamadı.";
+status.innerText="● ONLINE";
 
-    recognition.onresult=function(event){
+};
 
-        let komut=event.results[0][0].transcript.toLowerCase();
 
-        document.getElementById("durum").innerText=
-            "Sen: "+komut;
+r.onend=function(){
 
-        if(komut.includes("merhaba")){
-            konus("Merhaba. Size nasıl yardımcı olabilirim?");
-        }
+status.innerText="● ONLINE";
 
-        else if(komut.includes("nasılsın")){
-            konus("Teşekkür ederim. Sistemlerim hazır.");
-        }
+setTimeout(()=>{
 
-        else if(komut.includes("saat")){
-            let saat=new Date().toLocaleTimeString("tr-TR");
-            konus("Şu an saat "+saat);
-        }
+durum.innerText="Sistemler hazır.";
 
-        else{
-            konus("Komutunuzu duydum: "+komut);
-        }
-    };
+},500);
 
-    recognition.onerror=function(){
-        document.getElementById("durum").innerText=
-            "Ses alınamadı. Tekrar deneyin.";
-    };
+};
 
-    recognition.onend=function(){
-        document.getElementById("durum").innerText="Hazır...";
-    };
-}function yeniDinle(){
-    const SpeechRecognition =
-        window.SpeechRecognition ||
-        window.webkitSpeechRecognition;
 
-    if(!SpeechRecognition){
-        konus("Tarayıcınız sesli komutu desteklemiyor.");
-        return;
-    }
+r.start();
 
-    const r = new SpeechRecognition();
-    r.lang = "tr-TR";
-    r.continuous = false;
-    r.interimResults = false;
+}
 
-    document.getElementById("durum").innerText = "Dinliyorum...";
-
-    r.onresult = function(event){
-        const komut = event.results[0][0].transcript
-            .toLowerCase()
-            .trim();
-
-        document.getElementById("durum").innerText =
-            "Sen: " + komut;
-
-        if(komut.includes("merhaba")){
-            konus("Merhaba Baran. Sistemlerim hazır.");
-        }
-        else if(komut.includes("nasılsın")){
-            konus("Teşekkür ederim Baran. Gayet iyiyim.");
-        }
-        else if(komut.includes("saat")){
-            const saat = new Date().toLocaleTimeString("tr-TR");
-            konus("Şu an saat " + saat);
-        }
-        else if(komut.includes("youtube")){
-            konus("YouTube'u açıyorum.");
-            window.open("https://www.youtube.com", "_blank");
-        }
-        else if(komut.includes("google")){
-            konus("Google'ı açıyorum.");
-            window.open("https://www.google.com", "_blank");
-        }
-        else if(komut.includes("yardım")){
-            konus("Merhaba, saat, YouTube, Google veya nasılsın diyebilirsin.");
-        }
-        else{
-            konus("Komutunuzu duydum: " + komut);
-        }
-    };
-
-    r.onerror = function(){
-        document.getElementById("durum").innerText =
-            "Ses anlaşılamadı. Tekrar deneyin.";
-    };
-
-    r.start();
-                  }
-    
 </script>
 
 </body>
